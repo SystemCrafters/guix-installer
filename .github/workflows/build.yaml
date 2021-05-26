@@ -36,5 +36,10 @@ jobs:
 
       - name: Build ISO
         run: |
-          #$image=$(guix system image installer.scm)
-          guix system image installer.scm --image-size=5G
+          image=$(guix system image -t iso9660 installer.scm)
+          cp $image ./guix-installer.iso
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: guix-installer
+          path: guix-installer.iso
