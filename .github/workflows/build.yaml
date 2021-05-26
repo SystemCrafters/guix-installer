@@ -1,7 +1,9 @@
 name: Build Guix Installer
 
 on:
-  push: main
+  push:
+    branches:
+      - master
 
   # schedule:
   #   # build every 2 weeks
