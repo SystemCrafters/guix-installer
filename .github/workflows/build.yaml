@@ -37,4 +37,4 @@ jobs:
       - name: Build ISO
         run: |
           #$image=$(guix system image installer.scm)
-          guix system image installer.scm --image-size=5G
+          guix system --cores=$(nproc) image --image-type=iso9660 --image-size=3G install.scm
