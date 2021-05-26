@@ -1,0 +1,26 @@
+name: Build Guix Installer
+
+on:
+  push: main
+
+  # schedule:
+  #   # build every 2 weeks
+  #   - cron: "0 0 */14 * *"
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Git checkout
+        uses: actions/checkout@v2
+
+      - name: Install Guix
+        uses: PromyLOPh/guix-install-action@v1
+
+      - name: Build ISO
+        run: |
+          #$image=$(guix system image installer.scm)
+          guix system image installer.scm
