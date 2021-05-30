@@ -41,9 +41,11 @@ jobs:
 
       - name: Prepare Release Notes
         run: |
-          echo "This image was prepared with the following channel configuration:\n\n```\n" > release-notes.md
+          export RELEASE_TAG=$(date +"%Y%m%d%H%M")
+          echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
+          echo "# Guix Installer v$RELEASE_TAG\r\nThis image was prepared with the following channel configuration:\r\n\r\n\`\`\`\r\n" > release-notes.md
           guix describe -f channels >> release-notes.md
-          echo "\n```" >> release-notes.md
+          echo "\r\n\`\`\`" >> release-notes.md
 
       # - uses: actions/upload-artifact@v2
       #   with:
@@ -54,6 +56,7 @@ jobs:
         uses: softprops/action-gh-release@v1
         with:
           body_path: release-notes.md
+          tag: ${{ env.RELEASE_TAG }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: SystemCrafters/guix-installer
