@@ -5,9 +5,9 @@ on:
     branches:
       - master
 
-  # schedule:
-  #   # build every 2 weeks
-  #   - cron: "0 0 */14 * *"
+  schedule:
+    # build every week
+    - cron: "0 0 */7 * *"
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -39,7 +39,21 @@ jobs:
           image=$(guix system image -t iso9660 installer.scm)
           cp $image ./guix-installer.iso
 
-      - uses: actions/upload-artifact@v2
+      - name: Prepare Release Notes
+        run: |
+          echo "This image was prepared with the following channel configuration:\n\n```\n" > release-notes.md
+          guix describe -f channels >> release-notes.md
+          echo "\n```" >> release-notes.md
+
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: guix-installer
+      #     path: guix-installer.iso
+
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
         with:
-          name: guix-installer
-          path: guix-installer.iso
+          body_path: release-notes.md
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: SystemCrafters/guix-installer
