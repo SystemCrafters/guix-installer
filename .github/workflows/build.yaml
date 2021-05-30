@@ -34,15 +34,15 @@ jobs:
                         "2A39 3FFF 68F4 EF7A 3D29  12AF 6F51 20A0 22FB B2D5"))))
                     %default-channels)
 
-      # - name: Build ISO
-      #   run: |
-      #     image=$(guix system image -t iso9660 installer.scm)
-      #     cp $image ./guix-installer.iso
-
-      - name: Prepare Release Notes
+      - name: Build ISO
         run: |
           export RELEASE_TAG=$(date +"%Y%m%d%H%M")
           echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
+          image=$(guix system image -t iso9660 installer.scm)
+          cp $image ./guix-installer-$RELEASE_TAG.iso
+
+      - name: Prepare Release Notes
+        run: |
           echo $'This installer image was prepared with the following channel configuration:\r\n\r\n```\r\n' > release-notes.md
           guix describe -f channels >> release-notes.md
           echo $'\r\n```' >> release-notes.md
@@ -53,6 +53,7 @@ jobs:
           name: Guix Installer - ${{ env.RELEASE_TAG }}
           tag_name: v${{ env.RELEASE_TAG }}
           body_path: release-notes.md
+          files: guix-installer-${{ env.RELEASE_TAG }}.iso
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: SystemCrafters/guix-installer
