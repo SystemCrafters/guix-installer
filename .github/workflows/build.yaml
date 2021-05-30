@@ -34,10 +34,10 @@ jobs:
                         "2A39 3FFF 68F4 EF7A 3D29  12AF 6F51 20A0 22FB B2D5"))))
                     %default-channels)
 
-      - name: Build ISO
-        run: |
-          image=$(guix system image -t iso9660 installer.scm)
-          cp $image ./guix-installer.iso
+      # - name: Build ISO
+      #   run: |
+      #     image=$(guix system image -t iso9660 installer.scm)
+      #     cp $image ./guix-installer.iso
 
       - name: Prepare Release Notes
         run: |
