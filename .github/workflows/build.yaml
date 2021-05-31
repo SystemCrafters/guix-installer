@@ -36,7 +36,7 @@ jobs:
 
       - name: Build ISO
         run: |
-          export RELEASE_TAG=$(date +"%Y%m%d%H%M")
+          export RELEASE_TAG=$(date +%d-%m-%Y)
           echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
           image=$(guix system image -t iso9660 installer.scm)
           cp $image ./guix-installer-$RELEASE_TAG.iso
