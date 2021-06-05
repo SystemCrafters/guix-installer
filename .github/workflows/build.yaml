@@ -36,15 +36,21 @@ jobs:
 
       - name: Build ISO
         run: |
+          # Write out the channels file so it can be included
+          guix describe -f channels > channels.scm
+
+          # Build the image
+          image=$(guix system image -t iso9660 installer.scm)
+
+          # Copy the image to the local folder with a better name
           export RELEASE_TAG=$(date +"%Y%m%d%H%M")
           echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
-          image=$(guix system image -t iso9660 installer.scm)
           cp $image ./guix-installer-$RELEASE_TAG.iso
 
       - name: Prepare Release Notes
         run: |
           echo $'This installer image was prepared with the following channel configuration:\r\n\r\n```\r\n' > release-notes.md
-          guix describe -f channels >> release-notes.md
+          cat channels.scm >> release-notes.ms
           echo $'\r\n```' >> release-notes.md
 
       - name: Create Release
