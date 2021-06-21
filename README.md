@@ -9,8 +9,45 @@ this installer image is for you!
 
 ## Table of Contents :toc:noexport:
 - [System Crafters Guix Installer](#system-crafters-guix-installer)
+  - [Instructions](#instructions)
   - [Attributions](#attributions)
   - [License](#license)
+
+## Instructions
+
+1. Download a recently built `.iso` from this repo's
+   [release page](https://github.com/SystemCrafters/guix-installer/releases)
+2. Flash the `.iso` file into a USB stick with at least `3Gb`.
+
+### Flashing the ISO
+
+As stated in _step #2_ at [Instructions](#instructions), you will need to flash
+the `.iso` file into a USB stick.
+
+**[*]nix**:
+
+You should only need the `dd` utility (_coreutils_):
+
+- `dd status=progress if=guix-installerYYYYMMDDHHMM.iso of=/dev/foo`
+  - where `guix-installerYYYYMMDDHHMM.iso` is the name of the downloaded `.iso`
+    image and `foo` the name of the targeted device to flash the image.
+
+For the sake of providing an example, here's the full command:
+
+```sh
+`dd status=progress if=guix-installer-202106150234.iso of=/dev/sdb`
+```
+
+**NOTE #1**: You can list your devices with `lsblk`.
+
+**NOTE #2**: If `dd` won't work for some reason, refer to the **Windows**.
+
+**Windows**:
+
+- [balenaEtcher](https://www.balena.io/etcher) is a great **cross-platform**
+  _FOSS_ utility for flashing _GNU/Linux_ images.
+- If the above doesn't work, you might give [Rufus](https://rufus.ie/en_US/) a
+  look.
 
 ## Attributions
 
