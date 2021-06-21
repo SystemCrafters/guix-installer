@@ -7,7 +7,14 @@ This repository runs _automated CI builds_ to produce a
 modern laptop or hardware that is incompatible with the **Linux Libre kernel**,
 this installer image is for you!
 
-## Table of Contents :toc:noexport:
+You may take a look at the [image configuration](./installer.scm) and the
+[build workflow](./.github/workflows/build.yaml) to be sure that we aren't adding
+anything malicious to these builds!
+
+**A new ISO is produced at least once a week, sometimes more often if we're
+making improvements to the configuration.**
+
+## Table of Contents
 - [System Crafters Guix Installer](#system-crafters-guix-installer)
   - [Instructions](#instructions)
   - [Attributions](#attributions)
@@ -60,4 +67,4 @@ For the sake of providing an example, here's the full command:
 ## License
 
 The code in this repository is licensed under the
-[GNU General Public License v3](LICENSE.txt).
+[GNU General Public License v3](./LICENSE.txt).
