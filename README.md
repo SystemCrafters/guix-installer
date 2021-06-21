@@ -11,8 +11,8 @@ You may take a look at the [image configuration](./installer.scm) and the
 [build workflow](./.github/workflows/build.yaml) to be sure that we aren't adding
 anything malicious to these builds!
 
-**A new ISO is produced at least once a week, sometimes more often if we're
-making improvements to the configuration.**
+**A new `.iso` image is produced at least once a week, sometimes more often if
+we're making improvements to the configuration.**
 
 ## Table of Contents
 - [System Crafters Guix Installer](#system-crafters-guix-installer)
@@ -42,12 +42,12 @@ You should only need the `dd` utility (_coreutils_):
 For the sake of providing an example, here's the full command:
 
 ```sh
-`dd status=progress if=guix-installer-202106150234.iso of=/dev/sdb`
+dd status=progress if=guix-installer-202106150234.iso of=/dev/sdb
 ```
 
-**NOTE #1**: You can list your devices with `lsblk`.
+> NOTE #1: You can list your devices with `lsblk`.
 
-**NOTE #2**: If `dd` won't work for some reason, refer to the **Windows**.
+> NOTE #2: If `dd` won't work, refer to the **Windows** section.
 
 **Windows**:
 
