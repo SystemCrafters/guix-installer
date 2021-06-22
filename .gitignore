@@ -1,2 +1,2 @@
-./channels.scm
-./guix-installer.iso
+*.iso
+./guix/channels.scm

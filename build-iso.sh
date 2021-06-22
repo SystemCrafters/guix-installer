@@ -1,9 +1,37 @@
 #!/bin/sh
 
-# Write out the current channels to be included with the image
-guix describe -f channels > ./channels.scm
+# -----------------------------------------------------------------------------
+# Utilities
+# -----------------------------------------------------------------------------
 
-# Build the image and copy it to the current directory
-image=$(guix system image -t iso9660 ./installer.scm)
-echo "Built image: $image"
-cp $image ./guix-installer.iso
+die() {
+    # **
+    # Prints a message to stderr & exits script with non-successful code "1"
+    # *
+
+    printf '%s\n' "$@" >&2
+    exit 1
+}
+
+# -----------------------------------------------------------------------------
+# Main
+# -----------------------------------------------------------------------------
+
+# Write out the channels file so it can be included
+guix time-machine -C './guix/base-channels.scm' -- \
+     describe -f channels > './guix/channels.scm'
+
+# Build the image
+printf 'Attempting to build the image...\n\n'
+image=$(guix time-machine -C './guix/channels.scm' -- system image -t iso9660 './guix/installer.scm') \
+    || die 'Could not create image.'
+
+release_tag=$(date +"%Y%m%d%H%M")
+cp "${image}" "./guix-installer-${release_tag}.iso" ||
+    die 'An error occurred while copying.'
+
+printf 'Image was succesfully built: %s\n' "${image}"
+
+# cleanup
+unset -f die
+unset -v image release_tag
