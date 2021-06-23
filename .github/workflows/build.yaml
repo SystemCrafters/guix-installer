@@ -21,26 +21,14 @@ jobs:
 
       - name: Install Guix
         uses: PromyLOPh/guix-install-action@v1
-        with:
-          channels: |
-            (cons* (channel
-                    (name 'nonguix)
-                    (url "https://gitlab.com/nonguix/nonguix")
-                    ;; Enable signature verification:
-                    (introduction
-                     (make-channel-introduction
-                      "897c1a470da759236cc11798f4e0a5f7d4d59fbc"
-                      (openpgp-fingerprint
-                        "2A39 3FFF 68F4 EF7A 3D29  12AF 6F51 20A0 22FB B2D5"))))
-                    %default-channels)
 
       - name: Build ISO
         run: |
           # Write out the channels file so it can be included
-          guix describe -f channels > channels.scm
+          guix time-machine -C './guix/base-channels.scm' -- describe -f channels > './guix/channels.scm'
 
           # Build the image
-          image=$(guix system image -t iso9660 installer.scm)
+          image=$(guix time-machine -C './guix/channels.scm' -- system image -t iso9660 './guix/installer.scm')
 
           # Copy the image to the local folder with a better name
           export RELEASE_TAG=$(date +"%Y%m%d%H%M")
