@@ -38,7 +38,7 @@ jobs:
       - name: Prepare Release Notes
         run: |
           echo $'This installer image was prepared with the following channel configuration:\r\n\r\n```\r\n' > release-notes.md
-          cat channels.scm >> release-notes.md
+          cat ./guix/channels.scm >> release-notes.md
           echo $'\r\n```' >> release-notes.md
 
       - name: Create Release
