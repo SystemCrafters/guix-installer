@@ -7,7 +7,7 @@ This repository runs _automated CI builds_ to produce a
 modern laptop or hardware that is incompatible with the **Linux Libre kernel**,
 this installer image is for you!
 
-You may take a look at the [image configuration](./installer.scm) and the
+You may take a look at the [image configuration](./guix/installer.scm) and the
 [build workflow](./.github/workflows/build.yaml) to be sure that we aren't adding
 anything malicious to these builds!
 
