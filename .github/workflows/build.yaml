@@ -24,6 +24,9 @@ jobs:
 
       - name: Build ISO
         run: |
+          # Test MTU settings
+          ip a
+          
           # Write out the channels file so it can be included
           guix time-machine -C './guix/base-channels.scm' -- describe -f channels > './guix/channels.scm'
 
