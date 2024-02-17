@@ -23,10 +23,7 @@ jobs:
         uses: PromyLOPh/guix-install-action@v1.5
 
       - name: Build ISO
-        run: |
-          # Test MTU settings
-          sudo ip a
-          
+        run: |       
           # Write out the channels file so it can be included
           guix time-machine -C './guix/base-channels.scm' -- describe -f channels > './guix/channels.scm'
 
