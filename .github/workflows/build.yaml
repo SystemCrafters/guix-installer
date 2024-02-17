@@ -23,7 +23,10 @@ jobs:
         uses: PromyLOPh/guix-install-action@v1.5
 
       - name: Build ISO
-        run: |       
+        run: |
+          # output network settings to debug 
+          ip a
+          
           # Write out the channels file so it can be included
           guix time-machine -C './guix/base-channels.scm' -- describe -f channels > './guix/channels.scm'
 
