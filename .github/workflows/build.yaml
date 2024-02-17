@@ -16,6 +16,11 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Check network
+        run: |
+          # output network settings to debug
+          ip a
+          
       - name: Git checkout
         uses: actions/checkout@v4
 
@@ -23,10 +28,7 @@ jobs:
         uses: PromyLOPh/guix-install-action@v1.5
 
       - name: Build ISO
-        run: |
-          # output network settings to debug 
-          ip a
-          
+        run: |          
           # Write out the channels file so it can be included
           guix time-machine -C './guix/base-channels.scm' -- describe -f channels > './guix/channels.scm'
 
