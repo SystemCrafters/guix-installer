@@ -23,7 +23,7 @@ guix time-machine -C './guix/base-channels.scm' -- \
 
 # Build the image
 printf 'Attempting to build the image...\n\n'
-image=$(guix time-machine -C './guix/channels.scm' -- system image -t iso9660 './guix/installer.scm') \
+image=$(guix time-machine -C './guix/channels.scm' --substitute-urls='https://ci.guix.gnu.org https://bordeaux.guix.gnu.org https://substitutes.nonguix.org' -- system image -t iso9660 './guix/installer.scm') \
     || die 'Could not create image.'
 
 release_tag=$(date +"%Y%m%d%H%M")
