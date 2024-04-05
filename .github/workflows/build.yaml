@@ -28,7 +28,7 @@ jobs:
           guix time-machine -C './guix/base-channels.scm' -- describe -f channels > './guix/channels.scm'
 
           # Build the image
-          image=$(guix time-machine -C './guix/channels.scm' -- system image -t iso9660 './guix/installer.scm')
+          image=$(guix time-machine -C './guix/channels.scm' --substitute-urls='https://ci.guix.gnu.org https://bordeaux.guix.gnu.org https://substitutes.nonguix.org' -- system image -t iso9660 './guix/installer.scm')
 
           # Copy the image to the local folder with a better name
           export RELEASE_TAG=$(date +"%Y%m%d%H%M")
