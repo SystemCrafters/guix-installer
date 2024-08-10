@@ -19,7 +19,7 @@ jobs:
       - name: Git checkout
         uses: actions/checkout@v4
       - name: Guix cache
-        uses: actions/cache@v3
+        uses: actions/cache/restore@v3
         with:
           path: ~/.cache/guix
           # use a key that (almost) never matches
