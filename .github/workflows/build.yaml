@@ -18,6 +18,14 @@ jobs:
     steps:
       - name: Git checkout
         uses: actions/checkout@v4
+      - name: Guix cache
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/guix
+          # use a key that (almost) never matches
+          key: guix-cache-${{ github.sha }}
+          restore-keys: |
+            guix-cache-
 
       - name: Install Guix
         uses: PromyLOPh/guix-install-action@v1.5
@@ -38,21 +46,35 @@ jobs:
           # This is necessary to authorize the substitute server
           wget https://substitutes.nonguix.org/signing-key.pub
           mv signing-key.pub nonguix-signing-key.pub
-          sudo guix archive --authorize < nonguix-signing-key.pub
+          sudo /var/guix/profiles/per-user/root/current-guix/bin/guix archive --authorize < nonguix-signing-key.pub
 
+      - name: Set daemon level Substitutes
+        run: |
+          SUBSTITUTE_URLS="https://ci.guix.gnu.org https://bordeaux.guix.gnu.org https://substitutes.nonguix.org"
+          
+          sudo sed -i "s|--substitute-urls='https://bordeaux.guix.gnu.org https://ci.guix.gnu.org'|--substitute-urls='$SUBSTITUTE_URLS'|g" /etc/systemd/system/guix-daemon.service
+                
+          sudo systemctl daemon-reload
+          sudo systemctl restart guix-daemon.service    
+    
       - name: Build ISO
         run: |
-          SUBSTITUTE_URLS="--substitute-urls='https://ci.guix.gnu.org https://bordeaux.guix.gnu.org https://substitutes.nonguix.org'"
+          
           # Write out the channels file so it can be included
-          guix time-machine -C './guix/base-channels.scm' -- describe -f channels > './guix/channels.scm'
-
+          guix time-machine -C ./guix/base-channels.scm -- describe -f channels > ./guix/channels.scm
+          
           # Build the image
-          image=$(guix time-machine -C './guix/channels.scm' $SUBSTITUTE_URLS -- system image -t iso9660 $SUBSTITUTE_URLS './guix/installer.scm')
+          image=$(guix time-machine -C ./guix/channels.scm -- system image -t iso9660 ./guix/installer.scm)
 
           # Copy the image to the local folder with a better name
           export RELEASE_TAG=$(date +"%Y%m%d%H%M")
           echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
           cp $image ./guix-installer-$RELEASE_TAG.iso
+      - uses: actions/cache/save@v3
+        if: always()
+        with:
+          path: ~/.cache/guix
+          key: guix-cache-${{ github.sha }}
 
       - name: Prepare Release Notes
         run: |
