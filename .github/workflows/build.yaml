@@ -59,7 +59,7 @@ jobs:
     
       - name: Build ISO
         run: |
-          
+          guix install nss-certs
           # Write out the channels file so it can be included
           guix time-machine -C ./guix/base-channels.scm -- describe -f channels > ./guix/channels.scm
           
@@ -70,6 +70,17 @@ jobs:
           export RELEASE_TAG=$(date +"%Y%m%d%H%M")
           echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
           cp $image ./guix-installer-$RELEASE_TAG.iso
+          # Compress image in tar achirve
+          tar czvf guix-installer-$RELEASE_TAG.tar.gz ./guix-installer-$RELEASE_TAG.iso
+          # Github limits single files to 2GiB in releases.
+          IMAGE_SIZE=$(stat -c %s ./guix-installer-$RELEASE_TAG.tar.gz)
+          mkdir -p to-release
+          if test "$IMAGE_SIZE" -ge "2000000000"; then 
+            split -b 2GiB ./guix-installer-$RELEASE_TAG.tar.gz "guix-installer-$RELEASE_TAG.tar.gz-part-"
+            mv guix-installer-$RELEASE_TAG.tar.gz-part-* to-release/
+          else
+            mv ./guix-installer-$RELEASE_TAG.tar.gz to-release/
+          fi
       - uses: actions/cache/save@v3
         if: always()
         with:
@@ -88,7 +99,7 @@ jobs:
           name: Guix Installer - ${{ env.RELEASE_TAG }}
           tag_name: v${{ env.RELEASE_TAG }}
           body_path: release-notes.md
-          files: guix-installer-${{ env.RELEASE_TAG }}.iso
+          files: to-release/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: SystemCrafters/guix-installer
