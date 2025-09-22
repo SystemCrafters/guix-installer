@@ -16,6 +16,45 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: Aggressive cleanup
+        run: |
+          df -h
+
+          # Remove Java (JDKs)
+          sudo rm -rf /usr/lib/jvm
+
+          # Remove .NET SDKs
+          sudo rm -rf /usr/share/dotnet
+
+          # Remove Swift toolchain
+          sudo rm -rf /usr/share/swift
+
+          # Remove Haskell (GHC)
+          sudo rm -rf /usr/local/.ghcup
+
+          # Remove Julia
+          sudo rm -rf /usr/local/julia*
+
+          # Remove Android SDKs
+          sudo rm -rf /usr/local/lib/android
+
+          # Remove Chromium (optional if not using for browser tests)
+          sudo rm -rf /usr/local/share/chromium
+
+          # Remove Microsoft/Edge and Google Chrome builds
+          sudo rm -rf /opt/microsoft /opt/google
+
+          # Remove Azure CLI
+          sudo rm -rf /opt/az
+
+          # Remove PowerShell
+          sudo rm -rf /usr/local/share/powershell
+
+          # Remove CodeQL and other toolcaches
+          sudo rm -rf /opt/hostedtoolcache
+
+          df -h
+
       - name: Git checkout
         uses: actions/checkout@v4
       - name: Guix cache
@@ -28,7 +67,7 @@ jobs:
             guix-cache-
 
       - name: Install Guix
-        uses: PromyLOPh/guix-install-action@v1.5
+        uses: PromyLOPh/guix-install-action@v1.6
         with:
           channels: |
             (cons* (channel
@@ -89,6 +128,7 @@ jobs:
           tag_name: v${{ env.RELEASE_TAG }}
           body_path: release-notes.md
           files: guix-installer-${{ env.RELEASE_TAG }}.iso
+          fail_on_unmatched_files: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: SystemCrafters/guix-installer
