@@ -1,17 +1,13 @@
 name: Build Guix Installer
-
 on:
   push:
     branches:
       - master
-
   schedule:
     # build every week
     - cron: "0 0 */7 * *"
-
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
-
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -26,7 +22,6 @@ jobs:
           key: guix-cache-${{ github.sha }}
           restore-keys: |
             guix-cache-
-
       - name: Install Guix
         uses: PromyLOPh/guix-install-action@v1.5
         with:
@@ -40,14 +35,38 @@ jobs:
                          (openpgp-fingerprint
                            "2A39 3FFF 68F4 EF7A 3D29  12AF 6F51 20A0 22FB B2D5"))))
                     %default-channels)
-
+      - name: Verify and Fix Guix Daemon
+        run: |
+          # Check if daemon is running, if not investigate and restart
+          if ! systemctl is-active --quiet guix-daemon.service; then
+            echo "Guix daemon is not running, checking status..."
+            sudo systemctl status guix-daemon.service || true
+            sudo journalctl -xeu guix-daemon.service --no-pager || true
+            
+            echo "Attempting to start guix-daemon..."
+            sudo systemctl start guix-daemon.service
+            sleep 5
+            
+            # Verify it's running now
+            if ! systemctl is-active --quiet guix-daemon.service; then
+              echo "Failed to start guix-daemon"
+              exit 1
+            fi
+          fi
+          
+          # Verify socket exists
+          if [ ! -S /var/guix/daemon-socket/socket ]; then
+            echo "Daemon socket not found!"
+            exit 1
+          fi
+          
+          echo "Guix daemon is running successfully"
       - name: Set up Nonguix Substitutes
         run: |
           # This is necessary to authorize the substitute server
           wget https://substitutes.nonguix.org/signing-key.pub
           mv signing-key.pub nonguix-signing-key.pub
           sudo /var/guix/profiles/per-user/root/current-guix/bin/guix archive --authorize < nonguix-signing-key.pub
-
       - name: Set daemon level Substitutes
         run: |
           SUBSTITUTE_URLS="https://ci.guix.gnu.org https://bordeaux.guix.gnu.org https://substitutes.nonguix.org"
@@ -55,7 +74,17 @@ jobs:
           sudo sed -i "s|--substitute-urls='https://bordeaux.guix.gnu.org https://ci.guix.gnu.org'|--substitute-urls='$SUBSTITUTE_URLS'|g" /etc/systemd/system/guix-daemon.service
                 
           sudo systemctl daemon-reload
-          sudo systemctl restart guix-daemon.service    
+          sudo systemctl restart guix-daemon.service
+          
+          # Wait for daemon to be ready after restart
+          sleep 5
+          
+          # Verify daemon is still running
+          if ! systemctl is-active --quiet guix-daemon.service; then
+            echo "Guix daemon failed after restart"
+            sudo systemctl status guix-daemon.service
+            exit 1
+          fi
     
       - name: Build ISO
         run: |
@@ -65,7 +94,6 @@ jobs:
           
           # Build the image
           image=$(guix time-machine -C ./guix/channels.scm -- system image -t iso9660 ./guix/installer.scm)
-
           # Copy the image to the local folder with a better name
           export RELEASE_TAG=$(date +"%Y%m%d%H%M")
           echo "RELEASE_TAG=$RELEASE_TAG" >> $GITHUB_ENV
@@ -75,13 +103,11 @@ jobs:
         with:
           path: ~/.cache/guix
           key: guix-cache-${{ github.sha }}
-
       - name: Prepare Release Notes
         run: |
           echo $'This installer image was prepared with the following channel configuration:\r\n\r\n```\r\n' > release-notes.md
           cat ./guix/channels.scm >> release-notes.md
           echo $'\r\n```' >> release-notes.md
-
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
@@ -91,4 +117,4 @@ jobs:
           files: guix-installer-${{ env.RELEASE_TAG }}.iso
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          GITHUB_REPOSITORY: SystemCrafters/guix-installer
+          GITHUB_REPOSITORY: MMagueta/guix-installer
