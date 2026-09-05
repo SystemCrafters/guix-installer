@@ -11,8 +11,7 @@ You may take a look at the [image configuration](./guix/installer.scm) and the
 [build workflow](./.github/workflows/build.yaml) to be sure that we aren't adding
 anything malicious to these builds!
 
-**A new `.iso` image is produced at least once a week, sometimes more often if
-we're making improvements to the configuration.**
+**For up-to-date image, check out [gui.moe](https://codeberg.org/hako/guix.moe).**
 
 ## Table of Contents
 - [System Crafters Guix Installer](#system-crafters-guix-installer)
